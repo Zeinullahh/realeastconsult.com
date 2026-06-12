@@ -5,23 +5,29 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-inter);
   --font-serif: var(--font-playfair);
-  
-  --color-gold: #C9A87C;
-  --color-gold-light: #DCC8A0;
-  --color-gold-dark: #A68B5E;
-  --color-teal: #2D6B6B;
-  --color-teal-dark: #1F4F4F;
-  --color-terracotta: #B85450;
-  --color-terracotta-light: #C97A6E;
-  --color-cream: #FAF7F2;
-  --color-sand: #F5F0E8;
-  --color-dark: #1C1C1E;
-  --color-dark-light: #2C2C2E;
+
+  /* Sand & beige palette */
+  --color-sand-light: #FAF6EE;
+  --color-sand: #F5EFE4;
+  --color-sand-dark: #E8DFD0;
+  --color-beige: #F0E6D2;
+  --color-dune: #E3D5C0;
+  --color-camel: #D4B896;
+  --color-tan: #C4A57B;
+  --color-gold: #B8956A;
+  --color-gold-light: #D4B896;
+  --color-gold-dark: #9A7B52;
+  --color-bronze: #8B6F4E;
+  --color-coffee: #5C4632;
+  --color-espresso: #3D2E21;
+  --color-dark: #1E1812;
+  --color-dark-light: #2A2118;
+  --color-cream: #FAF6EE;
 }
 
 :root {
-  --background: #FAF7F2;
-  --foreground: #1C1C1E;
+  --background: #FAF6EE;
+  --foreground: #1E1812;
 }
 
 html {
@@ -37,9 +43,214 @@ body {
 }
 
 ::selection {
-  background: rgba(201, 168, 124, 0.3);
+  background: rgba(184, 149, 106, 0.35);
 }
 
 .text-balance {
   text-wrap: balance;
+}
+
+/* ---------- Sand grain texture overlay ---------- */
+.sand-grain {
+  position: relative;
+}
+.sand-grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  z-index: 1;
+}
+
+/* ---------- Glass morphism utilities ---------- */
+.glass {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(40px) saturate(160%);
+  -webkit-backdrop-filter: blur(40px) saturate(160%);
+  isolation: isolate;
+}
+
+.glass-strong {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(48px) saturate(170%);
+  -webkit-backdrop-filter: blur(48px) saturate(170%);
+  isolation: isolate;
+}
+
+.glass-dark {
+  background: rgba(30, 24, 18, 0.65);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  isolation: isolate;
+}
+
+.glass-gold {
+  background: linear-gradient(135deg, rgba(212, 184, 150, 0.22), rgba(245, 239, 228, 0.18));
+  backdrop-filter: blur(32px) saturate(150%);
+  -webkit-backdrop-filter: blur(32px) saturate(150%);
+  isolation: isolate;
+}
+
+/* ---------- Unified premium glass card ---------- */
+.glass-card {
+  background: rgba(30, 24, 18, 0.65);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  isolation: isolate;
+  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              box-shadow 0.5s ease,
+              background 0.5s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.4);
+  background: rgba(30, 24, 18, 0.78);
+}
+
+/* ---------- Inner nested glass ---------- */
+.glass-inner {
+  background: rgba(30, 24, 18, 0.55);
+  backdrop-filter: blur(32px) saturate(170%);
+  -webkit-backdrop-filter: blur(32px) saturate(170%);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  isolation: isolate;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.glass-inner:hover {
+  background: rgba(30, 24, 18, 0.7);
+  transform: translateY(-2px);
+}
+
+/* ---------- Text shadow for video readability ---------- */
+.text-shadow {
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+}
+
+.text-shadow-lg {
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* ---------- Sparkle / sand particles ---------- */
+.sparkle-field {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.sparkle {
+  position: absolute;
+  width: var(--size, 3px);
+  height: var(--size, 3px);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 248, 230, 1) 0%, rgba(212, 184, 150, 0.85) 50%, transparent 100%);
+  box-shadow: 0 0 calc(var(--size, 3px) * 1.5) rgba(255, 248, 230, 0.9);
+  opacity: 0;
+  animation-name: sand-sparkle;
+  animation-duration: var(--duration, 4s);
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-delay: var(--delay, 0s);
+  top: var(--y, 0%);
+  left: var(--x, 0%);
+}
+
+@keyframes sand-sparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.6);
+  }
+  25% {
+    opacity: var(--peak, 0.85);
+    transform: translate(6px, -8px) scale(1);
+  }
+  50% {
+    opacity: var(--peak, 0.85);
+    transform: translate(-4px, -14px) scale(1.15);
+  }
+  75% {
+    opacity: 0.2;
+    transform: translate(3px, -6px) scale(0.85);
+  }
+}
+
+/* ---------- Ambient glows ---------- */
+.glow-gold {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(184, 149, 106, 0.35), transparent 70%);
+  filter: blur(60px);
+  animation: glow-pulse 8s ease-in-out infinite;
+}
+
+.glow-beige {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(240, 230, 210, 0.45), transparent 70%);
+  filter: blur(70px);
+  animation: glow-pulse 10s ease-in-out infinite reverse;
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.1);
+  }
+}
+
+/* ---------- Floating grains ---------- */
+.float-grain {
+  animation: float-grain 6s ease-in-out infinite;
+}
+
+@keyframes float-grain {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* ---------- Elegant card hover ---------- */
+.card-glow {
+  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              box-shadow 0.5s ease;
+}
+.card-glow:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.15);
+}
+
+/* ---------- Section divider ---------- */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(184, 149, 106, 0.35), transparent);
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .sparkle,
+  .glow-gold,
+  .glow-beige,
+  .float-grain {
+    animation: none;
+  }
+  .card-glow:hover {
+    transform: none;
+  }
 }

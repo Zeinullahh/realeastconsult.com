@@ -5,13 +5,15 @@ import WhyUAE from "@/components/sections/WhyUAE";
 import Referral from "@/components/sections/Referral";
 import Contact from "@/components/sections/Contact";
 import Footer from "@/components/sections/Footer";
+import PersistentVideoBackground from "@/components/PersistentVideoBackground";
 
 export default function Home() {
   return (
     <>
       <Navbar />
-      <main className="flex-1">
-        <Hero />
+      <PersistentVideoBackground />
+      <Hero />
+      <main className="relative z-10 flex flex-col">
         <Services />
         <WhyUAE />
         <Referral />

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Phone } from "lucide-react";
-import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 const navLinks = [
   { href: "#services", label: "Услуги" },
@@ -13,8 +13,8 @@ const navLinks = [
 ];
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 40);
@@ -28,36 +28,28 @@ export default function Navbar() {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className={cn(
-          "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
-          scrolled
-            ? "bg-cream/90 backdrop-blur-md shadow-sm border-b border-gold/10"
-            : "bg-transparent"
-        )}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+          scrolled ? "bg-dark/70 backdrop-blur-md" : "bg-transparent"
+        }`}
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-20 items-center justify-between">
             <a href="#" className="flex items-center gap-3 group">
-              <img
-                src="/logo.jpg"
-                alt="Realeast Consulting"
-                className="h-10 w-10 rounded-lg object-cover"
-              />
+              <div className="relative">
+                <Image
+                  src="/logo.jpg"
+                  alt="Realeast Consulting"
+                  width={40}
+                  height={40}
+                  className="h-10 w-10 rounded-lg object-cover ring-1 ring-white/30"
+                />
+                <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-gold-light shadow-[0_0_8px_rgba(212,184,150,0.9)]" />
+              </div>
               <div className="flex flex-col">
-                <span
-                  className={cn(
-                    "font-serif text-xl font-semibold tracking-wide transition-colors",
-                    scrolled ? "text-dark" : "text-white"
-                  )}
-                >
+                <span className="font-serif text-xl font-semibold tracking-wide text-white">
                   Realeast
                 </span>
-                <span
-                  className={cn(
-                    "text-[10px] uppercase tracking-[0.2em] transition-colors -mt-0.5",
-                    scrolled ? "text-gold" : "text-gold-light"
-                  )}
-                >
+                <span className="text-[10px] uppercase tracking-[0.2em] text-white -mt-0.5">
                   Consulting
                 </span>
               </div>
@@ -68,10 +60,7 @@ export default function Navbar() {
                 <a
                   key={link.href}
                   href={link.href}
-                  className={cn(
-                    "text-sm font-medium tracking-wide uppercase transition-colors hover:text-gold",
-                    scrolled ? "text-dark/80" : "text-white/90"
-                  )}
+                  className="text-sm font-medium tracking-wide uppercase text-white transition-colors hover:text-gold"
                 >
                   {link.label}
                 </a>
@@ -81,10 +70,7 @@ export default function Navbar() {
             <div className="hidden md:flex items-center gap-4">
               <a
                 href="tel:+971581051108"
-                className={cn(
-                  "flex items-center gap-2 text-sm font-medium transition-colors hover:text-gold",
-                  scrolled ? "text-dark" : "text-white"
-                )}
+                className="flex items-center gap-2 text-sm font-medium text-white transition-colors hover:text-gold"
               >
                 <Phone className="w-4 h-4" />
                 <span>+971 58 105 1108</span>
@@ -93,7 +79,7 @@ export default function Navbar() {
                 href="https://wa.me/971528383246"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center rounded-full bg-gold px-5 py-2.5 text-sm font-medium text-dark transition-all hover:bg-gold-dark hover:shadow-lg hover:shadow-gold/20"
+                className="inline-flex items-center justify-center rounded-full bg-gold px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-gold-dark hover:shadow-lg hover:shadow-gold/20"
               >
                 Консультация
               </a>
@@ -101,10 +87,7 @@ export default function Navbar() {
 
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className={cn(
-                "md:hidden p-2 rounded-lg transition-colors",
-                scrolled ? "text-dark" : "text-white"
-              )}
+              className="md:hidden p-2 rounded-lg text-white transition-colors"
             >
               {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -119,9 +102,13 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-40 bg-dark pt-24 px-6 md:hidden"
+            className="fixed inset-0 z-40 pt-24 px-6 md:hidden"
+            style={{
+              background: "linear-gradient(180deg, rgba(30,24,18,0.96) 0%, rgba(61,46,33,0.95) 100%)",
+              backdropFilter: "blur(24px)",
+            }}
           >
-            <nav className="flex flex-col gap-6">
+            <nav className="relative z-10 flex flex-col gap-6">
               {navLinks.map((link, i) => (
                 <motion.a
                   key={link.href}
@@ -138,7 +125,7 @@ export default function Navbar() {
               <div className="mt-8 flex flex-col gap-4">
                 <a
                   href="tel:+971581051108"
-                  className="flex items-center gap-3 text-white/80"
+                  className="flex items-center gap-3 text-white"
                 >
                   <Phone className="w-5 h-5 text-gold" />
                   <span>+971 58 105 1108</span>
@@ -147,7 +134,7 @@ export default function Navbar() {
                   href="https://wa.me/971528383246"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center rounded-full bg-gold px-6 py-3 text-base font-medium text-dark"
+                  className="inline-flex items-center justify-center rounded-full bg-gold px-6 py-3 text-base font-medium text-white transition-all hover:bg-gold-dark"
                 >
                   Написать в WhatsApp
                 </a>
