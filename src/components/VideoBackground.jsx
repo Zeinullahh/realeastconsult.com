@@ -65,7 +65,6 @@ export default function VideoBackground() {
             loop
             playsInline
             preload="auto"
-            poster={POSTER_URL}
             onCanPlay={() => setCanPlay(true)}
             onPlaying={() => setCanPlay(true)}
             disablePictureInPicture
@@ -74,11 +73,10 @@ export default function VideoBackground() {
             <source src="/videos/background.mp4" type="video/mp4" />
           </video>
         )}
-        {/* Smooth fade from poster to video once it can play */}
+        {/* Brown placeholder that fades out once the video is ready */}
         <div
-          className="absolute inset-0 bg-cover bg-center z-10 transition-opacity duration-700 ease-out"
+          className="absolute inset-0 bg-dark z-10 transition-opacity duration-700 ease-out"
           style={{
-            backgroundImage: `url(${POSTER_URL})`,
             opacity: canPlay ? 0 : 1,
             pointerEvents: "none",
           }}
