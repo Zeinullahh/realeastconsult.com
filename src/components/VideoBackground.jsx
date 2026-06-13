@@ -1,135 +1,53 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 
 const VIDEO_ID = "2dEWPwVaUqM";
-const START_TIME = 8;
-const END_TIME = 360; // 6 minutes
+const POSTER_URL = `https://img.youtube.com/vi/${VIDEO_ID}/hqdefault.jpg`;
 
-function subscribeIsMobile(callback) {
+function subscribeReducedMotion(callback) {
+  const query = window.matchMedia("(prefers-reduced-motion: reduce)");
   const handler = () => callback();
-  window.addEventListener("resize", handler);
-  return () => window.removeEventListener("resize", handler);
+  query.addEventListener("change", handler);
+  return () => query.removeEventListener("change", handler);
 }
 
-function getIsMobile() {
-  if (typeof window === "undefined") return true;
-  const isMobileDevice = window.innerWidth < 768;
-  const prefersReducedMotion = window.matchMedia(
-    "(prefers-reduced-motion: reduce)"
-  ).matches;
-  return isMobileDevice || prefersReducedMotion;
-}
-
-function subscribeYTApiReady(callback) {
-  if (typeof window === "undefined") return () => {};
-  if (window.YT?.Player) return () => {};
-
-  const originalCallback = window.onYouTubeIframeAPIReady;
-  window.onYouTubeIframeAPIReady = () => {
-    callback();
-    if (originalCallback) originalCallback();
-  };
-
-  const scriptId = "youtube-iframe-api";
-  if (!document.getElementById(scriptId)) {
-    const tag = document.createElement("script");
-    tag.id = scriptId;
-    tag.src = "https://www.youtube.com/iframe_api";
-    document.body.appendChild(tag);
-  }
-
-  return () => {
-    window.onYouTubeIframeAPIReady = originalCallback;
-  };
-}
-
-function getYTApiReady() {
-  return typeof window !== "undefined" && !!window.YT?.Player;
+function getReducedMotion() {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
 export default function VideoBackground() {
-  const playerRef = useRef(null);
-  const targetRef = useRef(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const isMobile = useSyncExternalStore(subscribeIsMobile, getIsMobile, () => true);
-  const apiReady = useSyncExternalStore(subscribeYTApiReady, getYTApiReady, () => false);
+  const [canPlay, setCanPlay] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const reducedMotion = useSyncExternalStore(
+    subscribeReducedMotion,
+    getReducedMotion,
+    () => false
+  );
 
   useEffect(() => {
-    if (!apiReady || isMobile || !targetRef.current || !window.YT) return;
+    setMounted(true);
+  }, []);
 
-    if (targetRef.current.querySelector("iframe")) return;
+  // Fallback: hide poster after 3s even if events don't fire
+  useEffect(() => {
+    if (!mounted) return;
+    const timer = setTimeout(() => setCanPlay(true), 3000);
+    return () => clearTimeout(timer);
+  }, [mounted]);
 
-    playerRef.current = new window.YT.Player(targetRef.current, {
-      width: "1280",
-      height: "720",
-      videoId: VIDEO_ID,
-      playerVars: {
-        autoplay: 1,
-        mute: 1,
-        start: START_TIME,
-        controls: 0,
-        showinfo: 0,
-        modestbranding: 1,
-        rel: 0,
-        playsinline: 1,
-        iv_load_policy: 3,
-        fs: 0,
-        cc_load_policy: 0,
-      },
-      events: {
-        onReady: (event) => {
-          event.target.seekTo(START_TIME, true);
-          event.target.playVideo();
-        },
-        onStateChange: (event) => {
-          if (event.data === window.YT?.PlayerState.PLAYING) {
-            setIsPlaying(true);
-          }
-          if (event.data === window.YT?.PlayerState.ENDED) {
-            event.target.seekTo(START_TIME, true);
-            event.target.playVideo();
-          }
-        },
-      },
-    });
-
-    const interval = setInterval(() => {
-      if (playerRef.current?.getCurrentTime) {
-        const time = playerRef.current.getCurrentTime();
-        if (time >= END_TIME || time < START_TIME - 2) {
-          playerRef.current.seekTo(START_TIME, true);
-          playerRef.current.playVideo();
-        }
-      }
-    }, 1000);
-
-    // Fallback: hide overlay after 3s even if state event doesn't fire
-    const fallback = setTimeout(() => setIsPlaying(true), 3000);
-
-    return () => {
-      clearInterval(interval);
-      clearTimeout(fallback);
-      if (playerRef.current?.destroy) {
-        playerRef.current.destroy();
-      }
-      playerRef.current = null;
-    };
-  }, [apiReady, isMobile]);
-
-  if (isMobile) {
+  if (reducedMotion) {
     return (
       <div
         className="absolute inset-0 bg-cover bg-center"
-        style={{
-          backgroundImage: `url(https://img.youtube.com/vi/${VIDEO_ID}/hqdefault.jpg)`,
-        }}
+        style={{ backgroundImage: `url(${POSTER_URL})` }}
       />
     );
   }
 
   return (
-    <div className="absolute inset-0 overflow-hidden">
+    <div className="absolute inset-0 overflow-hidden bg-dark">
       <div
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
         style={{
@@ -139,14 +57,32 @@ export default function VideoBackground() {
           minWidth: "177.78vh",
         }}
       >
-        <div ref={targetRef} className="w-full h-full" />
-        {/* Cover YouTube thumbnail/play-button until video actually plays */}
+        {mounted && (
+          <video
+            className="w-full h-full object-cover"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            poster={POSTER_URL}
+            onCanPlay={() => setCanPlay(true)}
+            onPlaying={() => setCanPlay(true)}
+            disablePictureInPicture
+            disableRemotePlayback
+          >
+            <source src="/videos/background.mp4" type="video/mp4" />
+          </video>
+        )}
+        {/* Smooth fade from poster to video once it can play */}
         <div
-          className="absolute inset-0 bg-dark z-10 transition-opacity duration-700 ease-out"
-          style={{ opacity: isPlaying ? 0 : 1, pointerEvents: isPlaying ? "none" : "auto" }}
+          className="absolute inset-0 bg-cover bg-center z-10 transition-opacity duration-700 ease-out"
+          style={{
+            backgroundImage: `url(${POSTER_URL})`,
+            opacity: canPlay ? 0 : 1,
+            pointerEvents: "none",
+          }}
         />
-        {/* Block all interactions with YouTube UI (prevents stop/pause buttons from appearing/being clicked) */}
-        <div className="absolute inset-0 bg-transparent z-20" style={{ pointerEvents: "auto" }} />
       </div>
     </div>
   );
